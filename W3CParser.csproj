@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net7.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Attributes\" />
+    <Folder Include="Model\" />
+    <Folder Include="Parser\" />
+    <Folder Include="Instrumentation\" />
+    <Folder Include="Extensions\" />
+  </ItemGroup>
+</Project>

@@ -3,6 +3,11 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net7.0</TargetFramework>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>W3CParser</Title>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>iis logs</PackageTags>
+    <Description>iis logs parser</Description>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,5 +16,12 @@
     <Folder Include="Parser\" />
     <Folder Include="Instrumentation\" />
     <Folder Include="Extensions\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 </Project>

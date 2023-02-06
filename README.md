@@ -26,3 +26,6 @@ Set server variable in log IIS [New IIS functionality to help identify weak TLS 
 ```
 
 
+dotnet add package W3CParser --version 1.0.0
+
+

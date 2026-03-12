@@ -1,43 +1,44 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
+﻿using System.Reflection;
 using W3CParser.Attributes;
 using W3CParser.Model;
 
-namespace W3CParser.Parser
+namespace W3CParser.Parser;
+
+sealed class W3CFieldsParser
 {
-	class W3CFieldsParser
-	{
-		void GetFieldAttributeByName(string name, FieldInfo[] w3cFields, Action<W3CFieldBaseAttribute, FieldInfo> foundBlock)
-		{
-			for (var fieldIndexPosition = 0; fieldIndexPosition < w3cFields.Length; fieldIndexPosition++)
-			{
-                var w3cField = w3cFields[fieldIndexPosition];
-                var fieldAttribute = (W3CFieldBaseAttribute)w3cField.GetCustomAttributes(typeof(W3CFieldBaseAttribute), false).FirstOrDefault();
-                if (fieldAttribute != null && fieldAttribute.FieldName == name)
-                {
-                    foundBlock(fieldAttribute, w3cField);
-                    break;
-                }
-			}
-		}
+    sealed class FieldBinding(W3CFieldBaseAttribute attribute, FieldInfo fieldInfo)
+    {
+        public W3CFieldBaseAttribute Attribute { get; } = attribute;
+        public FieldInfo FieldInfo { get; } = fieldInfo;
+    }
 
-		public W3CFieldMap Parse(string line)
-		{
-			var fieldMap = new W3CFieldMap();
-			var w3cFields = typeof(W3CEvent).GetFields();
-			var lineFields = line.Split(' ');
-            var lineFieldsIndex = 0;
-
-            foreach(var lineField in lineFields)
+    static readonly IReadOnlyDictionary<string, FieldBinding> KnownFields =
+        typeof(W3CEvent)
+            .GetFields(BindingFlags.Instance | BindingFlags.Public)
+            .Select(fieldInfo => new
             {
-				GetFieldAttributeByName(lineField, w3cFields, (fieldAttribute, fieldInfo) =>
-				{
-					fieldMap.Add(lineFieldsIndex, fieldAttribute.Convertor, fieldInfo);
-				});
-                lineFieldsIndex += 1;
-			}
-			return fieldMap;
-		}
-	}
+                FieldInfo = fieldInfo,
+                Attribute = fieldInfo.GetCustomAttributes<W3CFieldBaseAttribute>(false).FirstOrDefault()
+            })
+            .Where(x => x.Attribute is not null)
+            .ToDictionary(
+                x => x.Attribute!.FieldName,
+                x => new FieldBinding(x.Attribute!, x.FieldInfo),
+                StringComparer.OrdinalIgnoreCase);
+
+    public static W3CFieldMap Parse(string line)
+    {
+        var fieldMap = new W3CFieldMap();
+        var lineFields = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+        for (var index = 0; index < lineFields.Length; index++)
+        {
+            if (KnownFields.TryGetValue(lineFields[index], out var binding))
+            {
+                fieldMap.Add(index, binding.Attribute.Convertor, binding.FieldInfo);
+            }
+        }
+
+        return fieldMap;
+    }
 }

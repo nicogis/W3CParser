@@ -1,57 +1,29 @@
-﻿using System;
-using W3CParser.Convertors;
+﻿using W3CParser.Convertors;
 
-namespace W3CParser.Attributes
+namespace W3CParser.Attributes;
+
+abstract class W3CFieldBaseAttribute(string name, ITextConvertor convertor) : Attribute
 {
-	abstract class W3CFieldBaseAttribute : Attribute
-	{
-		public readonly string FieldName;
-		public readonly ITextConvertor Convertor;
+    public string FieldName { get; } = name;
+    public ITextConvertor Convertor { get; } = convertor;
+}
 
-		protected W3CFieldBaseAttribute(string name)
-		{
-			FieldName = name;
-		}
+sealed class W3CFieldAttribute(string name) : W3CFieldBaseAttribute(name, new StringConvertor())
+{
+}
 
-		protected W3CFieldBaseAttribute(string name, ITextConvertor convertor)
-		{
-			FieldName = name;
-			Convertor = convertor;
-		}
-	}
+sealed class W3CFieldTimeAttribute(string name) : W3CFieldBaseAttribute(name, new TimeConvertor())
+{
+}
 
-	class W3CFieldAttribute : W3CFieldBaseAttribute
-	{
-		public W3CFieldAttribute(string name) : base(name, new StringConvertor())
-		{
-		}
-	}
+sealed class W3CFieldDateAttribute(string name) : W3CFieldBaseAttribute(name, new DateTimeOffsetConvertor())
+{
+}
 
-	class W3CFieldTimeAttribute : W3CFieldBaseAttribute
-	{
-		public W3CFieldTimeAttribute(string name) : base(name, new TimeConvertor())
-		{
-		}
-	}
+sealed class W3CInt32Attribute(string name) : W3CFieldBaseAttribute(name, new Int32Convertor())
+{
+}
 
-	class W3CFieldDateAttribute : W3CFieldBaseAttribute
-	{
-		public W3CFieldDateAttribute(string name) : base(name, new DateTimeOffsetConvertor())
-		{
-		}
-	}
-
-	class W3CInt32Attribute : W3CFieldBaseAttribute
-	{
-		public W3CInt32Attribute(string name) : base(name, new Int32Convertor())
-        {
-        }
-	}
-
-    class W3CHexAttribute : W3CFieldBaseAttribute
-    {
-        public W3CHexAttribute(string name) : base(name, new HexConvertor())
-        {
-        }
-    }
+sealed class W3CHexAttribute(string name) : W3CFieldBaseAttribute(name, new HexConvertor())
+{
 }

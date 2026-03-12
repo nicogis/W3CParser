@@ -1,64 +1,57 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using W3CParser.Model;
+﻿using W3CParser.Model;
 
-namespace W3CParser.Parser
+namespace W3CParser.Parser;
+
+public sealed class W3CReader(TextReader reader) : IDisposable
 {
-    public sealed class W3CReader
-	{
-        public String Software { get; private set; }
-	    TextReader Reader { get; }
-		
-		public W3CReader(TextReader reader)
-		{
-			Reader = reader;
-		}
+    public string? Software { get; private set; }
 
-		string RightOf(string token, string line)
-		{
-			var returnValue = line.Substring(token.Length + 2);
-			return returnValue;
-		}
+    static string RightOf(string token, string line) => line[(token.Length + 2)..];
 
-		void ParseHeader(string line, Action<string> fieldsBlock)
-		{			
-            const string commentFields = "#Fields";
-            const string commentSoftware = "#Software";
+    void ParseHeader(string line, Action<string> fieldsBlock)
+    {
+        const string CommentFields = "#Fields";
+        const string CommentSoftware = "#Software";
 
-            if (line.StartsWith(commentSoftware, StringComparison.OrdinalIgnoreCase))
+        if (line.StartsWith(CommentSoftware, StringComparison.OrdinalIgnoreCase))
+        {
+            Software = RightOf(CommentSoftware, line);
+        }
+        else if (line.StartsWith(CommentFields, StringComparison.OrdinalIgnoreCase))
+        {
+            fieldsBlock(RightOf(CommentFields, line));
+        }
+    }
+
+    public IEnumerable<W3CEvent> Read()
+    {
+        var itemParser = new W3CItemsParser();
+        W3CFieldMap? fieldMap = null;
+
+        string? line;
+        while ((line = reader.ReadLine()) is not null)
+        {
+            if (line.StartsWith("#", StringComparison.OrdinalIgnoreCase))
             {
-                Software = RightOf(commentSoftware, line);
+                ParseHeader(line, fieldsLine =>
+                {
+                    fieldMap = W3CFieldsParser.Parse(fieldsLine);
+                });
+
+                continue;
             }
-            else if (line.StartsWith(commentFields, StringComparison.OrdinalIgnoreCase))
-			{
-				fieldsBlock(RightOf(commentFields, line));
-			}
-		}
 
-		public IEnumerable<W3CEvent> Read()
-		{			
-			var itemParser = new W3CItemsParser();
-			var fieldMap = (W3CFieldMap)null;
-            var line = (string)null;
+            if (fieldMap is null)
+            {
+                continue;
+            }
 
-			while ((line = Reader.ReadLine()) != null)
-			{
-                if (line.StartsWith("#", StringComparison.OrdinalIgnoreCase))
-				{
-					ParseHeader(line, (fieldsLine) =>
-					{
-						fieldMap = new W3CFieldsParser().Parse(fieldsLine);
-					});
-					continue;
-				}
+            yield return W3CItemsParser.Parse(line, fieldMap);
+        }
+    }
 
-				if (fieldMap == null)
-					continue;
-
-				yield return itemParser.Parse(line, fieldMap);
-			}
-		}
-	}
+    public void Dispose()
+    {
+        reader.Dispose();
+    }
 }

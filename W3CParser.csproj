@@ -1,13 +1,31 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Library</OutputType>
-    <TargetFramework>net7.0</TargetFramework>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <TargetFramework>net10.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
+    <PackageVersion>1.1.0</PackageVersion>
+    <PackageId>W3CParser</PackageId>
+
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+	<NeutralLanguage>en</NeutralLanguage>
     <Title>W3CParser</Title>
+    <Description>IIS W3C log parser with TLS field support.</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageTags>iis logs</PackageTags>
-    <Description>iis logs parser</Description>
+    <PackageTags>iis;w3c;logs;tls</PackageTags>
+
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <FileVersion>1.1.0.0</FileVersion>
+
+    <Authors>nicogis</Authors>
+	
+	<PackageIcon>icon.png</PackageIcon>
+    <PackageProjectUrl>https://github.com/nicogis/W3CParser</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/nicogis/W3CParser.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReleaseNotes>Updated to .NET 10 and added TLS 1.3 support.</PackageReleaseNotes>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,9 +37,19 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include=".github\copilot-instructions.md" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="README.md">
-      <Pack>True</Pack>
+      <Pack>true</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+
+    <None Include="icon.png">
+      <Pack>true</Pack>
       <PackagePath>\</PackagePath>
     </None>
   </ItemGroup>
+
 </Project>

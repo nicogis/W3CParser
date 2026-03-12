@@ -1,7 +1,6 @@
-﻿namespace W3CParser.Convertors
+﻿namespace W3CParser.Convertors;
+
+interface ITextConvertor
 {
-	interface ITextConvertor
-	{
-		dynamic Convert(string text);
-	}
+    object Convert(string text);
 }

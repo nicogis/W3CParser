@@ -1,26 +1,24 @@
 ﻿using W3CParser.Model;
 
-namespace W3CParser.Parser
+namespace W3CParser.Parser;
+
+sealed class W3CItemsParser
 {
-	sealed class W3CItemsParser
-	{
-		public W3CEvent Parse(string line, W3CFieldMap fieldMap)
-		{
-			var returnValue = new W3CEvent();
-			var fieldValueIndex = 0;
+    public static W3CEvent Parse(string line, W3CFieldMap fieldMap)
+    {
+        var returnValue = new W3CEvent();
+        var fieldValueIndex = 0;
 
-			foreach (var fieldValue in line.Split(' '))
-			{
-				if (fieldMap.ContainsKey(fieldValueIndex))
-				{
-					var fieldInfo = fieldMap[fieldValueIndex];
+        foreach (var fieldValue in line.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+        {
+            if (fieldMap.TryGetValue(fieldValueIndex, out var fieldInfo))
+            {
+                fieldInfo.FieldInfo.SetValue(returnValue, fieldInfo.Convertor.Convert(fieldValue));
+            }
 
-                    fieldInfo.FieldInfo.SetValue(returnValue, fieldInfo.Convertor.Convert(fieldValue));
-				}
-				fieldValueIndex += 1;
-			}
+            fieldValueIndex += 1;
+        }
 
-			return returnValue;
-		}
-	}
+        return returnValue;
+    }
 }

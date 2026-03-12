@@ -1,47 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using W3CParser.Convertors;
 
-namespace W3CParser.Model
+namespace W3CParser.Model;
+
+sealed class W3CFieldMap
 {
-    sealed class W3CFieldMap
+    public sealed class W3CFieldMapInfo
     {
-        public sealed class W3CFieldMapInfo
+        public ITextConvertor Convertor { get; }
+        public FieldInfo FieldInfo { get; }
+
+        public W3CFieldMapInfo(ITextConvertor convertor, FieldInfo fieldInfo)
         {
-            readonly public ITextConvertor Convertor;
-            readonly public FieldInfo FieldInfo;
-
-            public W3CFieldMapInfo(ITextConvertor convertorType, FieldInfo fieldInfo)
-            {
-                Convertor = convertorType;
-                FieldInfo = fieldInfo;
-            }
+            Convertor = convertor;
+            FieldInfo = fieldInfo;
         }
+    }
 
-        readonly Dictionary<int, W3CFieldMapInfo> FieldDictionary = new Dictionary<int, W3CFieldMapInfo>(22);
+    readonly Dictionary<int, W3CFieldMapInfo> fieldDictionary = new(22);
 
-        #region Public
-        public bool IsEmpty() { return !FieldDictionary.Any(); }
+    public bool ContainsKey(int key) => fieldDictionary.ContainsKey(key);
 
-        public bool ContainsKey(int key)
-        {
-            return FieldDictionary.ContainsKey(key);
-        }
+    public bool TryGetValue(int key, [NotNullWhen(true)] out W3CFieldMapInfo? value) =>
+        fieldDictionary.TryGetValue(key, out value);
 
-        public W3CFieldMapInfo this[int key]
-        {
-            get
-            {
-                return FieldDictionary[key];
-            }
-        }
+    public W3CFieldMapInfo this[int key] => fieldDictionary[key];
 
-        public void Add(int fieldIndex, ITextConvertor convertorType, FieldInfo fieldInfo)
-        {
-            FieldDictionary.Add(fieldIndex, new W3CFieldMapInfo(convertorType, fieldInfo));
-        }
-        #endregion
+    public void Add(int fieldIndex, ITextConvertor convertor, FieldInfo fieldInfo)
+    {
+        fieldDictionary.Add(fieldIndex, new W3CFieldMapInfo(convertor, fieldInfo));
     }
 }

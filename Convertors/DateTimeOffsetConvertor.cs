@@ -1,10 +1,13 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 
-namespace W3CParser.Convertors
+namespace W3CParser.Convertors;
+
+public class DateTimeOffsetConvertor : ITextConvertor
 {
-    public class DateTimeOffsetConvertor : ITextConvertor
-    {
-        public dynamic Convert(string text) => DateTimeOffset.ParseExact(text, "yyyy'-'MM'-'dd", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
-    }
+    public object Convert(string text) =>
+        DateTimeOffset.ParseExact(
+            text,
+            "yyyy'-'MM'-'dd",
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.AssumeUniversal);
 }

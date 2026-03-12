@@ -1,21 +1,15 @@
-﻿using System;
-using W3CParser.Enumerators;
+﻿using System.Globalization;
 
-namespace W3CParser.Convertors
+namespace W3CParser.Convertors;
+
+public class HexConvertor : ITextConvertor
 {
-    public class HexConvertor : ITextConvertor
-    {
-        public dynamic Convert(string text)
-        {
-            if (long.TryParse(text, System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture, out long k))
-            {
-                return k;
-            }
-            else
-            {
-                return 0;
-            }
-                      
-        }
-    }
+    public object Convert(string text) =>
+        long.TryParse(
+            text,
+            NumberStyles.HexNumber,
+            CultureInfo.InvariantCulture,
+            out var value)
+            ? value
+            : 0L;
 }
